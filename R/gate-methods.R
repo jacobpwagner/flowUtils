@@ -21,6 +21,7 @@ setMethod(
         if (flowEnv[['.flowUtilsRead.GatingML.PassNo']] == 2) 
         {
             gateId = (xmlGetAttr(object, "id", genid(flowEnv)))
+            gateName = (xmlGetAttr(object, "name", genid(flowEnv)))
             parentId = (xmlGetAttr(object, "parent_id", "NULL"))
             dimensionList= xmlElementsByTagName(object, "dimension")
             len = length(dimensionList)
@@ -30,7 +31,7 @@ setMethod(
             vertexLimits = matrix(nrow=len, ncol=length(dimensionList))
             for (i in seq(len)) vertexLimits[i,] = getParameters(vertexList[[i]]) 
             filt = polygonGate(filterId=gateId, .gate=vertexLimits, transformationList)
-
+            attr(filt, "name") <- gateName
             if(parentId == "NULL")
             {
                 flowEnv[[as.character(gateId)]] = filt
@@ -38,7 +39,9 @@ setMethod(
             else
             {
                 temp = new("filterReference", name=parentId, env=flowEnv, filterId="NULL")
-                flowEnv[[as.character(gateId)]] = new("subsetFilter", filters=list(filt, temp), filterId=gateId)    
+                gate <- new("subsetFilter", filters=list(filt, temp), filterId=gateId)
+                attr(gate, "name") <- gateName
+                flowEnv[[as.character(gateId)]] = gate
             }
         }
     }
@@ -52,6 +55,7 @@ setMethod(
         if (flowEnv[['.flowUtilsRead.GatingML.PassNo']] == 2) 
         {
             gateId = (xmlGetAttr(object, "id", genid(flowEnv)))
+            gateName = (xmlGetAttr(object, "name", genid(flowEnv)))
             parentId = (xmlGetAttr(object, "parent_id", "NULL"))
             dimensionList = xmlElementsByTagName(object, "dimension")
             len = length(dimensionList)
@@ -62,6 +66,7 @@ setMethod(
             }
             transformationList <- getTransformationListGml2(dimensionList, flowEnv)
             filt = rectangleGate(filterId=gateId, .gate=gateLimits, transformationList)
+            attr(filt, "name") <- gateName
             if (parentId == "NULL")
             {
                 flowEnv[[as.character(gateId)]] = filt
@@ -69,7 +74,9 @@ setMethod(
             else
             {
                 temp = new("filterReference", name=parentId, env=flowEnv, filterId="NULL")
-                flowEnv[[as.character(gateId)]] = new("subsetFilter", filters=list(filt, temp), filterId=gateId)
+                gate <- new("subsetFilter", filters=list(filt, temp), filterId=gateId)
+                attr(gate, "name") <- gateName
+                flowEnv[[as.character(gateId)]] = gate
             }
         }
     }
@@ -83,6 +90,7 @@ setMethod(
         if (flowEnv[['.flowUtilsRead.GatingML.PassNo']] == 2) 
         {
             gateId = (xmlGetAttr(object, "id", genid(flowEnv)))
+            gateName = (xmlGetAttr(object, "name", genid(flowEnv)))
             parentId = (xmlGetAttr(object, "parent_id", "NULL"))
             dimensionList = xmlElementsByTagName(object, "dimension")
             len = length(dimensionList)
@@ -126,6 +134,7 @@ setMethod(
         if (flowEnv[['.flowUtilsRead.GatingML.PassNo']] == 2) 
         {
             gateId = (xmlGetAttr(object, "id", genid(flowEnv)))
+            gateName = (xmlGetAttr(object, "name", genid(flowEnv)))
             parentId = (xmlGetAttr(object, "parent_id", "NULL"))
             dividerList = xmlElementsByTagName(object, "divider")
             dividers <- list()
@@ -196,9 +205,11 @@ setMethod(
         if (flowEnv[['.flowUtilsRead.GatingML.PassNo']] == 2) 
         {
             gateId = (xmlGetAttr(object, "id", genid(flowEnv)))
+            gateName = (xmlGetAttr(object, "name", genid(flowEnv)))
             parentId = (xmlGetAttr(object, "parent_id", "NULL"))
             childern = xmlChildren(object)
             filt <- identifyNode(childern[[length(childern)]], flowEnv)
+            attr(filt, "name") <- gateName
             if (parentId == "NULL")
             {
                 filt@filterId = as.character(gateId)
@@ -207,7 +218,9 @@ setMethod(
             else
             {
                 temp = new("filterReference", name=parentId, env=flowEnv, filterId="NULL")
-                flowEnv[[as.character(gateId)]] = new("subsetFilter", filters=list(filt, temp), filterId=gateId)
+                gate <- new("subsetFilter", filters=list(filt, temp), filterId=gateId)
+                attr(gate, "name") <- gateName
+                flowEnv[[as.character(gateId)]] = gate
             }
         }
     }
@@ -358,8 +371,10 @@ setMethod(
     function(object, flowEnv, ...)
     {  
         gateId = (xmlGetAttr(object, "id", genid(flowEnv)))
+        gateName = (xmlGetAttr(object, "name", genid(flowEnv)))
         parentId = (xmlGetAttr(object, "parent_id", "NULL"))
         filt <- identifyNode(xmlChildren(object)[[1]], flowEnv)
+        attr(filt, "name") <- gateName
         if (parentId == "NULL")
         {
 			filt@filterId = as.character(gateId)
@@ -368,7 +383,9 @@ setMethod(
         else
     {
             temp = new("filterReference", name=parentId, env=flowEnv, filterId="NULL")
-            flowEnv[[as.character(gateId)]] = new("subsetFilter", filters=list(filt, temp), filterId=gateId)
+            gate <- new("subsetFilter", filters=list(filt, temp), filterId=gateId)
+            attr(gate, "name") <- gateName
+            flowEnv[[as.character(gateId)]] = gate
         }
     }
 )
@@ -379,6 +396,7 @@ setMethod(
     function(object, flowEnv, ...)
     {   
         gateId = (xmlGetAttr(object, "id", genid(flowEnv)))
+        gateName = (xmlGetAttr(object, "name", genid(flowEnv)))
         parentId = (xmlGetAttr(object, "parent_id", "NULL"))
         dimensionList = xmlElementsByTagName(object, "dimension")
         len = length(dimensionList)
@@ -389,6 +407,7 @@ setMethod(
         }  
         transformationList <- getTransformationList(dimensionList, flowEnv)
         filt=rectangleGate(filterId=gateId, .gate=gateLimits, transformationList)
+        attr(filt, "name") <- gateName
         if (parentId == "NULL")
         {
             flowEnv[[as.character(gateId)]] = filt
@@ -396,7 +415,9 @@ setMethod(
         else
         {
             temp = new("filterReference", name=parentId, env=flowEnv, filterId="NULL")
-            flowEnv[[as.character(gateId)]] = new("subsetFilter", filters=list(filt, temp), filterId=gateId)
+            gate <- new("subsetFilter", filters=list(filt, temp), filterId=gateId)
+            attr(gate, "name") <- gateName
+            flowEnv[[as.character(gateId)]] = gate 
         }
     }
 ) 
@@ -407,6 +428,7 @@ setMethod(
     function(object, flowEnv, ...)
     {  
         gateId = (xmlGetAttr(object, "id", genid(flowEnv)))
+        gateName = (xmlGetAttr(object, "name", genid(flowEnv)))
         parentId = (xmlGetAttr(object, "parent_id", "NULL"))
         dimensionList = xmlElementsByTagName(object, "dimension")
         len = length(dimensionList)
@@ -419,6 +441,7 @@ setMethod(
             vertexLimits[i,] = getParameters(vertexList[[i]]) 
         }  
         filt = polygonGate(filterId=gateId,.gate=vertexLimits,transformationList)
+        attr(filt, "name") <- gateName
         if (parentId == "NULL")
         {
             flowEnv[[as.character(gateId)]] = filt
@@ -426,7 +449,9 @@ setMethod(
         else
         {
             temp = new("filterReference", name=parentId, env=flowEnv, filterId="NULL")
-            flowEnv[[as.character(gateId)]] = new("subsetFilter", filters=list(filt, temp), filterId=gateId)    
+            gate <- new("subsetFilter", filters=list(filt, temp), filterId=gateId)
+            attr(gate, "name") <- gateName
+            flowEnv[[as.character(gateId)]] = gate   
         }                      
     }
 ) 
@@ -438,6 +463,7 @@ setMethod(
     function(object, flowEnv, ...)
     {  
         gateId = (xmlGetAttr(object, "id", genid(flowEnv)))
+        gateName = (xmlGetAttr(object, "name", genid(flowEnv)))
         parentId = (xmlGetAttr(object, "parent_id", "NULL"))
         dimensionList= xmlElementsByTagName(object, "dimension")
         len = length(dimensionList)
@@ -453,6 +479,7 @@ setMethod(
         }  
         distance = sqrt(getParameters(xmlElementsByTagName(object, "distanceSquare")[[1]]))
         filt = ellipsoidGate(filterId=gateId, .gate=covMat, mean=meanLimits, distance=distance, transformationList)
+        attr(filt, "name") <- gateName
         if (parentId == "NULL")
         {
             flowEnv[[as.character(gateId)]] = filt
@@ -460,7 +487,9 @@ setMethod(
         else
         {
             temp = new("filterReference", name=parentId, env=flowEnv, filterId="NULL")
-            flowEnv[[as.character(gateId)]] = new("subsetFilter", filters=list(filt, temp), filterId=gateId)
+            gate <- new("subsetFilter", filters=list(filt, temp), filterId=gateId)
+            attr(gate, "name") <- gateName
+            flowEnv[[as.character(gateId)]] = gate
         }
     }
 ) 
@@ -471,6 +500,7 @@ setMethod(
     function(object, flowEnv, ...)
     {  
         gateId = (xmlGetAttr(object, "id", genid(flowEnv)))
+        gateName = (xmlGetAttr(object, "name", genid(flowEnv)))
         parentId = (xmlGetAttr(object, "parent_id", "NULL"))
         dimensionList = xmlElementsByTagName(object, "dimension")
         len = length(dimensionList)
@@ -485,6 +515,7 @@ setMethod(
         a = matrix(halfValues[,1:length(dimensionList)], ncol=length(dimensionList))
         b = (halfValues[,length(dimensionList)+1])
         filt = polytopeGate(filterId=gateId, .gate=a, b=b, transformationList)
+        attr(filt, "name") <- gateName
         if (parentId == "NULL")
         {
             flowEnv[[as.character(gateId)]] = filt
@@ -492,7 +523,9 @@ setMethod(
         else
         {   
             temp = new("filterReference", name=parentId, env=flowEnv, filterId="NULL")
-            flowEnv[[as.character(gateId)]] = new("subsetFilter", filters=list(filt, temp), filterId=gateId)
+            gate <- new("subsetFilter", filters=list(filt, temp), filterId=gateId)
+            attr(gate, "name") <- gateName
+            flowEnv[[as.character(gateId)]] = gate 
         }
     }
 )      
@@ -503,10 +536,12 @@ setMethod(
     function(object, flowEnv, ...)
     {  
         gateId = (xmlGetAttr(object, "id", genid(flowEnv)))
+        gateName = (xmlGetAttr(object, "name", genid(flowEnv)))
         parentId = (xmlGetAttr(object, "parent_id", "NULL"))
         root = xmlChildren(object)[[1]]
         test = decisionHelper(root)
         filt = do.call(expressionFilter, list(expr=test))
+        attr(filt, "name") <- gateName
         if (parentId == "NULL")
         {
             flowEnv[[as.character(gateId)]] = filt
@@ -514,7 +549,9 @@ setMethod(
         else
         {  
             temp = new("filterReference", name=parentId, env=flowEnv, filterId="NULL")
-            flowEnv[[as.character(gateId)]] = new("subsetFilter", filters=list(filt, temp), filterId=gateId)
+            gate <- new("subsetFilter", filters=list(filt, temp), filterId=gateId)
+            attr(gate, "name") <- gateName
+            flowEnv[[as.character(gateId)]] = gate
         }
     }
 )
